@@ -1,0 +1,9 @@
+api:
+  url: http://marijn.mono.sdn.io/deployapi/
+
+repositories:
+  directory: /var/www/deploy
+  check_interval: 1
+
+deploy:
+  time_between_servers: 15
