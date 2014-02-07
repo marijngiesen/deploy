@@ -14,11 +14,10 @@ class GitRepo:
 
         try:
             self.repository = pygit2.Repository(repository_path)
-        except KeyError, e:
+        except KeyError:
             self.clone()
 
 
-    # Clone a Git repository
     def clone(self):
         self.repository = pygit2.clone_repository(self.origin_url, self.repository_path,
                                                   checkout_branch=self.origin_branch)
