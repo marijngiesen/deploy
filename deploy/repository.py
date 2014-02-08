@@ -68,4 +68,5 @@ class GitRepo:
 
     def log(self):
         last = self.repository[self.repository.head.target]
+
         return self.repository.walk(last.oid, pygit2.GIT_SORT_TIME)

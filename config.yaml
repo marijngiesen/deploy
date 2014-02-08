@@ -1,5 +1,5 @@
 api:
-  url: http://marijn.mono.sdn.io/deployapi/
+  url: http://marijn.mono.sdn.io/deployapi
 
 repositories:
   directory: /var/www/deploy
