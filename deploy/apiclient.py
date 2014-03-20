@@ -1,22 +1,13 @@
 import requests
 import registry
+import json
 
 
 class ApiClient:
     def __init__(self):
         pass
 
-    # Returns:
-    # Projects: {
-    #   Id: <id>,
-    #   Name: <name>,
-    #   Url: <url>,
-    #   Servers: {[
-    #       Id: <id>,
-    #       HostName: <hostname>,
-    #       IpAddress: <ipaddress>,
-    #   ]}
-    # }
+
     def get_projects(self):
         response = requests.get(registry.config["api"]["url"] + "/projects")
         return response.json()
@@ -26,11 +17,15 @@ class ApiClient:
         response = requests.get(registry.config["api"]["url"] + "/projects/%s" % str(id))
         return response.json()
 
-    def update_version(self, project_id, hash, committer, message):
-        response = requests.post(registry.config["api"]["url"] + "/projects/%s/version" % str(project_id))
+
+    def add_version(self, project_id, commit_hash, date_added, message, author, changes):
+        payload = {"Hash": commit_hash, "DateAdded": date_added, "Message": message, "Author": author,
+                   "Changes": changes}
+        response = requests.post(registry.config["api"]["url"] + "/projects/%s/version" % str(project_id),
+                                 data=json.dumps(payload))
         return response
 
-    # Returns: {QueueId: <id>, ProjectId: <id>, VersionHash: <hash>}
+
     def get_queue(self):
         response = requests.get(registry.config["api"]["url"] + "/queue")
         return response.json()
