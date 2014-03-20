@@ -18,10 +18,10 @@ class ApiClient:
         return response.json()
 
 
-    def add_version(self, project_id, commit_hash, date_added, message, author, changes):
+    def add_commit(self, project_id, commit_hash, date_added, message, author, changes):
         payload = {"Hash": commit_hash, "DateAdded": date_added, "Message": message, "Author": author,
                    "Changes": changes}
-        response = requests.post(registry.config["api"]["url"] + "/projects/%s/version" % str(project_id),
+        response = requests.post(registry.config["api"]["url"] + "/projects/%s/commit" % str(project_id),
                                  data=json.dumps(payload))
         return response
 
