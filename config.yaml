@@ -1,10 +1,13 @@
 api:
-#  url: http://marijn.mono.sdn.io/deployapi
-  url: http://localhost:6127
+  url: http://marijn.mono.sdn.io/deployapi
+#  url: http://localhost:6127
 
 repositories:
-  directory: /var/www/deploy
+  path: /var/www/deploy
   check_interval: 1
+
+queue:
+  check_interval: 5
 
 deploy:
   time_between_servers: 15

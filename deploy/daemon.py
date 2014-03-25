@@ -1,6 +1,5 @@
 import os
 import sys
-import time
 import signal
 import debug
 import registry
@@ -10,9 +9,7 @@ def run(callback, foreground=False):
     signal.signal(signal.SIGTERM, shutdown)
     if foreground: signal.signal(signal.SIGINT, shutdown)
 
-    while True:
-        callback()
-        time.sleep(registry.config["repositories"]["check_interval"] * 60)
+    callback()
 
 
 def shutdown(signal, frame):
