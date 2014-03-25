@@ -14,5 +14,5 @@ setup(
             'deployd = deploy.main:main',
         ]
     },
-    requires=['BeautifulSoup', 'requests', 'pygit2']
+    requires=['requests', 'pygit2']
 )

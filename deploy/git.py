@@ -2,71 +2,88 @@ import pygit2
 
 
 class Git:
-    repository_path = None
-    repository = None
-    origin_url = None
-    origin_branch = None
+	repository_path = None
+	repository = None
+	origin_url = None
+	origin_branch = None
 
-    def __init__(self, repository_path, origin_url, origin_branch="master"):
-        self.repository_path = repository_path
-        self.origin_url = origin_url
-        self.origin_branch = origin_branch
+	def __init__(self, repository_path, origin_url, origin_branch="master"):
+		self.repository_path = repository_path
+		self.origin_url = origin_url
+		self.origin_branch = origin_branch
 
-        try:
-            self.repository = pygit2.Repository(repository_path)
-        except KeyError:
-            self.clone()
+		try:
+			self.repository = pygit2.Repository(repository_path)
+		except KeyError:
+			self.clone()
 
+	def clone(self):
+		self.repository = pygit2.clone_repository(self.origin_url, self.repository_path,
+		                                          checkout_branch=self.origin_branch)
+		self.repository.checkout()
 
-    def clone(self):
-        self.repository = pygit2.clone_repository(self.origin_url, self.repository_path,
-                                                  checkout_branch=self.origin_branch)
-        self.repository.checkout()
+	def status(self):
+		return self.repository.status()
 
+	def check_origin(self):
+		origin_index = [index for index, remote in enumerate(self.repository.remotes) if "origin" in remote.name]
 
-    def status(self):
-        return self.repository.status()
+		if len(origin_index) == 0:
+			return self.repository.create_remote("origin", self.origin_url)
 
+		remote = self.repository.remotes[origin_index[0]]
 
-    def check_origin(self):
-        origin_index = [index for index, remote in enumerate(self.repository.remotes) if "origin" in remote.name]
+		if remote.url != self.origin_url:
+			remote.url = self.origin_url
 
-        if len(origin_index) == 0:
-            return self.repository.create_remote("origin", self.origin_url)
+		return remote
 
-        remote = self.repository.remotes[origin_index[0]]
+	def check_for_new_commits_on_origin(self):
+		remote = self.check_origin()
+		remote.fetch()
 
-        if remote.url != self.origin_url:
-            remote.url = self.origin_url
+		return len(self.repository.diff("master", "origin/%s" % self.origin_branch))
 
-        return remote
+	def merge_origin(self):
+		remote_commit = self.repository.revparse_single("origin/%s" % self.origin_branch)
+		# merge_result = self.repository.merge(remote_commit.oid)
 
+		local_commit = self.repository.revparse_single("HEAD")
 
-    def check_for_new_commits_on_origin(self):
-        remote = self.check_origin()
-        remote.fetch()
+		print "-" * 80
 
-        return len(self.repository.diff("master", "origin/%s" % self.origin_branch))
+		counter = 0
+		commits = self.repository.walk(remote_commit.oid, pygit2.GIT_SORT_TIME)
 
+		for commit in self.repository.walk(remote_commit.oid, pygit2.GIT_SORT_TIME):
+			print "%s: (%s) %s " % (commit.commit_time, commit.oid, commit.message)
 
-    def merge_origin(self):
-        remote_commit = self.repository.revparse_single("origin/%s" % self.origin_branch)
-        merge_result = self.repository.merge(remote_commit.oid)
+			if local_commit.oid == commit.oid:
+				break
 
-        if merge_result.is_fastforward:
-            reference = self.repository.lookup_reference("refs/heads/master")
-            reference.target = merge_result.fastforward_oid.hex
-
-            return True
-
-        return False
-
-
-    def get_references(self):
-        return self.repository.listall_references()
+			counter += 1
 
 
-    def log(self):
-        last = self.repository[self.repository.head.target]
+		print "-" * 80
+		print "local is %s behind remote" % str(counter)
 
-        return self.repository.walk(last.oid, pygit2.GIT_SORT_TIME)
+		# counter = 0
+		# for commit in self.repository.walk(self.repository.revparse_single("HEAD").oid, pygit2.GIT_SORT_TIME):
+		# 	print "%s: (%s) %s " % (commit.commit_time, commit.oid, commit.message)
+		# 	counter += 1
+		# 	if counter == 2:
+		# 		break
+
+		# if merge_result.is_fastforward:
+		# 	reference = self.repository.lookup_reference("refs/heads/master")
+		# 	reference.target = merge_result.fastforward_oid.hex
+		#
+		# 	return True
+		#
+		# return False
+
+	def get_references(self):
+		return self.repository.listall_references()
+
+	def log(self):
+		return self.repository.walk(self.repository.head.target, pygit2.GIT_SORT_TIME)

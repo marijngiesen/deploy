@@ -11,7 +11,6 @@ class Api:
     @staticmethod
     def get_projects():
         response = requests.get(registry.config["api"]["url"] + "/projects")
-        print response
 
         return response.json()
 
@@ -19,7 +18,6 @@ class Api:
     @staticmethod
     def get_project(id):
         response = requests.get(registry.config["api"]["url"] + "/projects/%s" % str(id))
-        print response
 
         return response.json()
 
