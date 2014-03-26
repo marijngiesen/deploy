@@ -21,8 +21,9 @@ class Api:
 
     @staticmethod
     def add_commit(project_id, commit_hash, date_added, message, author, changes):
-        payload = {"Hash": commit_hash, "DateAdded": date_added, "Message": message, "Author": author,
-                   "Changes": changes}
+        payload = {"Hash": str(commit_hash), "DateAdded": str(date_added), "Message": str(message), "Author": str(author),
+                   "Changes": str(changes)}
+
         headers = {'content-type': 'application/json'}
 
         response = requests.post(registry.config["api"]["url"] + "/projects/%s/commit" % str(project_id),

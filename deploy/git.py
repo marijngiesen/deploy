@@ -44,26 +44,27 @@ class Git:
         remote.fetch()
 
         remote_commit = self.repository.revparse_single("origin/%s" % self.origin_branch)
-        local_commit = self.repository.revparse_single("HEAD")
+        local_commit = self.repository.revparse_single("master")
 
         debug.message("Local is at %s" % str(local_commit.oid), indent=1)
         debug.message("Remote is at %s" % str(remote_commit.oid), indent=1)
 
-        counter = 0
+        commits = []
         for commit in self.repository.walk(remote_commit.oid, pygit2.GIT_SORT_TIME):
             if local_commit.oid == commit.oid:
                 break
 
-            counter += 1
+            commits.append(commit)
 
-        if counter == 1:
+        commit_count = len(commits)
+        if commit_count == 1:
             text = "commit"
         else:
             text = "commits"
 
-        debug.message("Master is %d %s behind origin/master" % (counter, text), indent=1)
+        debug.message("Master is %d %s behind origin/master" % (commit_count, text), indent=1)
 
-        return counter
+        return commits
 
     def merge_origin(self):
         remote_commit = self.repository.revparse_single("origin/%s" % self.origin_branch)
@@ -79,6 +80,3 @@ class Git:
 
     def get_references(self):
         return self.repository.listall_references()
-
-    def log(self):
-        return self.repository.walk(self.repository.head.target, pygit2.GIT_SORT_TIME)
