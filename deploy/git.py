@@ -46,8 +46,8 @@ class Git:
         remote_commit = self.repository.revparse_single("origin/%s" % self.origin_branch)
         local_commit = self.repository.revparse_single("HEAD")
 
-        debug.message("Local is at %s" % str(local_commit.oid))
-        debug.message("Remote is at %s" % str(remote_commit.oid))
+        debug.message("Local is at %s" % str(local_commit.oid), indent=1)
+        debug.message("Remote is at %s" % str(remote_commit.oid), indent=1)
 
         counter = 0
         for commit in self.repository.walk(remote_commit.oid, pygit2.GIT_SORT_TIME):
@@ -61,7 +61,7 @@ class Git:
         else:
             text = "commits"
 
-        debug.message("Local master is %d %s behind origin/master" % (counter, text))
+        debug.message("Master is %d %s behind origin/master" % (counter, text), indent=1)
 
         return counter
 

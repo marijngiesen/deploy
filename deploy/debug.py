@@ -17,9 +17,12 @@ def disable():
     Debug.enabled = 0
 
 
-def message(msg):
+def message(msg, indent=0):
     if Debug.enabled:
-        print str(datetime.today()) + " " + str(Debug.process) + ": " + str(msg)
+        msg = str(msg)
+        if indent > 0:
+            msg = "+" * indent + " " + msg
+        print str(datetime.today()) + " " + str(Debug.process) + ": " + msg
 
 
 def exception(msg, e):
