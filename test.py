@@ -1,4 +1,4 @@
-from deploy.git import Git
+from deploy.lib.git import Git
 
 repository = Git("/var/www/deploy/deploy+ui", "https://github.com/marijngiesen/deploy-ui.git")
 

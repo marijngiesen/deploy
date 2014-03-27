@@ -10,5 +10,4 @@ def watch():
         for queueitem in queue:
             pass
 
-        # time.sleep(registry.config["queue"]["check_interval"] * 60)
-        time.sleep(registry.config["queue"]["check_interval"])
+        time.sleep(registry.config["queue"]["check_interval"] * 60)

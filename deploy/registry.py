@@ -1,4 +1,4 @@
-from config import Config
+from lib.config import Config
 
 process = "deploy"
 logfile = "deploy.log"

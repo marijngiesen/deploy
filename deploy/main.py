@@ -1,11 +1,11 @@
 import sys
 import time
-import debug
-import daemon
+from multiprocessing import Process
+
+from lib import daemon, debug
 import registry
 import repository
 import queue
-from multiprocessing import Process
 
 
 def run():

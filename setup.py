@@ -3,7 +3,7 @@ from setuptools import setup
 setup(
     name='deploy',
     version='0.0.1',
-    packages=['deploy'],
+    packages=['deploy', 'deploy.lib'],
     url='http://www.studio-donder.nl/',
     license='MIT',
     author='Marijn Giesen',

@@ -23,19 +23,20 @@ class Api:
     def add_commit(project_id, commit_hash, date_added, message, author, changes):
         payload = {"Hash": str(commit_hash), "DateAdded": str(date_added), "Message": str(message), "Author": str(author),
                    "Changes": str(changes)}
-
         headers = {'content-type': 'application/json'}
-
         response = requests.post(registry.config["api"]["url"] + "/projects/%s/commit" % str(project_id),
                                  data=json.dumps(payload), headers=headers)
+
         return response.json()
 
     @staticmethod
     def get_queue():
         response = requests.get(registry.config["api"]["url"] + "/queue")
+
         return response.json()
 
     @staticmethod
     def remove_from_queue(id):
         response = requests.delete(registry.config["api"]["url"] + "/queue/%s" % str(id))
+
         return response

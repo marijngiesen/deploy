@@ -1,10 +1,10 @@
-from datetime import datetime
 import os
 import time
-import debug
 import registry
-from git import Git
+from lib.git import Git
+from lib import debug
 from api import Api
+from datetime import datetime
 
 
 def watch():
