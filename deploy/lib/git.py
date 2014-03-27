@@ -69,6 +69,8 @@ class Git:
 
             commits.append(commit)
 
+        commits.reverse()
+
         commit_count = len(commits)
         if commit_count == 1:
             text = "commit"
@@ -98,3 +100,17 @@ class Git:
             return True
 
         return False
+
+    def get_commits(self, limit=20):
+        commits = []
+        last_commit = self.repository.revparse_single("master")
+
+        for commit in self.repository.walk(last_commit.oid, pygit2.GIT_SORT_TIME):
+            commits.append(commit)
+
+            if len(commits) == limit:
+                break
+
+        commits.reverse()
+
+        return commits
