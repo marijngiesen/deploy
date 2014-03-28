@@ -1,3 +1,4 @@
+from _pygit2 import GitError
 import os
 import time
 import registry
@@ -19,6 +20,8 @@ def watch():
 
         except ValueError, e:
             debug.exception("Error retrieving projects", e)
+        except GitError, e:
+            debug.exception("Error wit Git repository", e)
 
         time.sleep(registry.config["repositories"]["check_interval"] * 60)
 
@@ -26,14 +29,14 @@ def watch():
 def check_repository_status(project):
     origin_url = get_origin_url(project)
     repository = Git(os.path.join(registry.config["repositories"]["path"], project["FormattedName"]), origin_url)
-    commit_count = save_commits(repository.check_for_new_commits_on_origin(), project)
+    commit_count = save_commits(repository.check_for_new_commits_on_origin(), project, repository)
 
     if commit_count > 0:
         repository.merge_origin()
 
-    # Add 20 commits if this is a new repository
+    # Add <initial_nr_commits> commits if this is a new repository
     if project["Commits"] is None or len(project["Commits"]) == 0:
-        save_commits(repository.get_commits(registry.config["repositories"]["initial_nr_commits"]), project)
+        save_commits(repository.get_commits(registry.config["repositories"]["initial_nr_commits"]), project, repository)
 
 
 def get_origin_url(project):
@@ -48,11 +51,18 @@ def get_origin_url(project):
     return origin_url
 
 
-def save_commits(commits, project):
+def save_commits(commits, project, repository):
     for commit in commits:
         debug.message("Add commit %s to database" % commit.oid, indent=2)
 
         commit_date = datetime.fromtimestamp(int(commit.commit_time)).strftime('%Y-%m-%d %H:%M:%S')
-        Api.add_commit(project["ID"], commit.oid, commit_date, commit.message, commit.author.name, "")
+
+        if len(commit.parents) > 0:
+            changes = repository.get_changes(commit, commit.parents[0])
+        else:
+            changes = repository.get_changes(commit)
+
+        Api.add_commit(project["ID"], commit.oid, commit_date, commit.message, commit.author.name, changes)
 
     return len(commits)
+

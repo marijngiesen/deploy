@@ -1,7 +1,6 @@
 import os
 import sys
 import signal
-
 import debug
 import registry
 

@@ -102,6 +102,13 @@ class Git:
         return False
 
     def get_commits(self, limit=20):
+        """
+        Get a list of commmits
+
+        :rtype : list
+        :param limit: The maximum number of commits returned
+        :return: A list of commit objects
+        """
         commits = []
         last_commit = self.repository.revparse_single("master")
 
@@ -114,3 +121,34 @@ class Git:
         commits.reverse()
 
         return commits
+
+    def get_commit(self, oid):
+        """
+        Get a single commit
+
+        :rtype : object
+        :param oid: The object ID of the commit
+        :return: The commit object
+        """
+        return self.repository.revparse_single(oid)
+
+    def get_changes(self, commit1, commit2=None):
+        """
+        Get the list of changes between commits
+
+        :rtype : str
+        :param commit1: The first commit object
+        :param commit2: The second commit object
+        :return: The list of changes
+        """
+
+        if commit2 is None:
+            diff = commit1.tree.diff_to_tree()
+        else:
+            diff = self.repository.diff(commit1, commit2)
+
+        changes = []
+        for patch in diff:
+            changes.append("[%s] %s" % (patch.status, patch.new_file_path))
+
+        return "\n".join(changes)
