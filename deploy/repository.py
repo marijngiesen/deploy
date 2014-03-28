@@ -33,7 +33,7 @@ def check_repository_status(project):
 
     # Add 20 commits if this is a new repository
     if project["Commits"] is None or len(project["Commits"]) == 0:
-        save_commits(repository.get_commits(), project)
+        save_commits(repository.get_commits(registry.config["repositories"]["initial_nr_commits"]), project)
 
 
 def get_origin_url(project):

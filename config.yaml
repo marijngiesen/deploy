@@ -5,6 +5,7 @@ api:
 repositories:
   path: /var/www/deploy
   check_interval: 1
+  initial_nr_commits: 20
 
 queue:
   check_interval: 5
