@@ -1,7 +1,6 @@
 import sys
 import time
-from multiprocessing import Process
-
+from multiprocessing import Process, Queue
 from lib import daemon, debug
 import registry
 import repository
@@ -9,27 +8,26 @@ import queue
 
 
 def run():
-    process_count = 2
+    processes = []
 
     # Start repository watcher
     repository_watcher = Process(target=repository.watch)
     repository_watcher.start()
+    processes.append(repository_watcher)
 
     # Start deploy queue watcher
     queue_watcher = Process(target=queue.watch)
     queue_watcher.start()
+    processes.append(queue_watcher)
 
     # The main loop
-    while process_count > 0:
-        if not repository_watcher.is_alive():
-            repository_watcher.join(2)
-            process_count -= 1
+    while len(processes) > 0:
+        for process in processes:
+            if not process.is_alive():
+                process.join(2)
+                processes.remove(process)
 
-        if not queue_watcher.is_alive():
-            queue_watcher.join(2)
-            process_count -= 1
-
-        time.sleep(5)
+        time.sleep(1)
 
 
 def main():

@@ -5,6 +5,7 @@ class Debug(object):
     logfile = None
     logfile_handle = None
     process = ""
+    prefix = "main"
     enabled = 0
 
 
@@ -17,12 +18,16 @@ def disable():
     Debug.enabled = 0
 
 
+def set_prefix(prefix):
+    Debug.prefix = prefix
+
+
 def message(msg, indent=0):
     if Debug.enabled:
         msg = str(msg)
         if indent > 0:
             msg = "+" * indent + " " + msg
-        print str(datetime.today()) + " " + str(Debug.process) + ": " + msg
+        print str(datetime.today()) + " " + str(Debug.process) + ": [" + str(Debug.prefix) + "] " + msg
 
 
 def exception(msg, e):
@@ -43,7 +48,9 @@ def open_log(process, logfile):
 def write_log(message):
     if Debug.logfile_handle is not None:
         try:
-            Debug.logfile_handle.write(str(datetime.today()) + " " + str(Debug.process) + ": " + str(message) + "\n")
+            Debug.logfile_handle.write(
+                str(datetime.today()) + " " + str(Debug.process) + ": [" + str(Debug.prefix) + "] " + str(
+                    message) + "\n")
         except Exception, e:
             pass
 

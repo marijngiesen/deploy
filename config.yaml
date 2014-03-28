@@ -1,14 +1,23 @@
+# Deploy configuration file
+# -------------------------
+# check_interval: check interval in seconds
+# time_between_servers: time between deployment on multiple servers in seconds
+# initial_nr_commits: the number of commits saved to database of a new project
+
 api:
   url: http://marijn.mono.sdn.io/deployapi
 #  url: http://localhost:6127
 
 repositories:
-  path: /var/www/deploy
-  check_interval: 1
+  path: /var/www/deploy/repositories
+  check_interval: 60
   initial_nr_commits: 20
 
 queue:
-  check_interval: 5
+  check_interval: 30
+
+build:
+  path: /var/www/deploy/build
 
 deploy:
   time_between_servers: 15

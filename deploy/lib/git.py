@@ -126,7 +126,7 @@ class Git:
         """
         Get a single commit
 
-        :rtype : object
+        :rtype : pygit2.Commit
         :param oid: The object ID of the commit
         :return: The commit object
         """
@@ -152,3 +152,10 @@ class Git:
             changes.append("[%s] %s" % (patch.status, patch.new_file_path))
 
         return "\n".join(changes)
+
+    def checkout_commit(self, oid):
+        commit = self.get_commit(oid)
+        reference = self.repository.create_reference("refs/heads/deployed", commit.oid, True)
+
+        self.repository.checkout(reference, pygit2.GIT_CHECKOUT_FORCE)
+        self.repository.head = reference.name

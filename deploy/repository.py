@@ -10,6 +10,7 @@ from datetime import datetime
 
 def watch():
     while True:
+        debug.set_prefix("repository_watcher")
         debug.message("Retrieving projects")
         try:
             projects = Api.get_projects()
@@ -23,16 +24,15 @@ def watch():
         except GitError, e:
             debug.exception("Error with Git repository", e)
         except OSError, e:
-            debug.exception("Error connecting to remote Git repository", e)
+            debug.exception("Error connecting to remote", e)
         except Exception, e:
             debug.exception("Unknown error", e)
 
-        time.sleep(registry.config["repositories"]["check_interval"] * 60)
+        time.sleep(registry.config["repositories"]["check_interval"])
 
 
 def check_repository_status(project):
-    origin_url = get_origin_url(project)
-    repository = Git(os.path.join(registry.config["repositories"]["path"], project["FormattedName"]), origin_url)
+    repository = Git(get_path(project), get_origin_url(project))
     commit_count = save_commits(repository.check_for_new_commits_on_origin(), project, repository)
 
     if commit_count > 0:
@@ -41,6 +41,10 @@ def check_repository_status(project):
     # Add <initial_nr_commits> commits if this is a new repository
     if project["Commits"] is None or len(project["Commits"]) == 0:
         save_commits(repository.get_commits(registry.config["repositories"]["initial_nr_commits"]), project, repository)
+
+
+def get_path(project):
+    return os.path.join(registry.config["repositories"]["path"], project["FormattedName"])
 
 
 def get_origin_url(project):
