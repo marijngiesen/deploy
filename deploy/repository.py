@@ -21,7 +21,11 @@ def watch():
         except ValueError, e:
             debug.exception("Error retrieving projects", e)
         except GitError, e:
-            debug.exception("Error wit Git repository", e)
+            debug.exception("Error with Git repository", e)
+        except OSError, e:
+            debug.exception("Error connecting to remote Git repository", e)
+        except Exception, e:
+            debug.exception("Unknown error", e)
 
         time.sleep(registry.config["repositories"]["check_interval"] * 60)
 
