@@ -5,12 +5,13 @@ import repository
 from api import Api
 from lib.git import Git
 from lib import debug
+from commitstatus import CommitStatus
 
 
 def watch():
     while True:
         debug.set_prefix("queue_watcher")
-        debug.message("Retrieving queue")
+        debug.message("Checking deploy queue")
         try:
             queue = Api.get_queue()
 
@@ -43,13 +44,15 @@ def prepare_repository(queueitem):
     repo = Git(repository.get_path(queueitem["Commit"]["Project"]),
                repository.get_origin_url(queueitem["Commit"]["Project"]))
 
-    # Move the HEAD to the correct commit
+    # Check out the correct commit and create a reference to it (deployed)
     repo.checkout_commit(queueitem["Commit"]["Hash"])
 
 
 def build(queueitem):
     debug.message("Build project %s" % queueitem["Commit"]["Project"]["Name"], indent=1)
+    Api.update_status(queueitem["Commit"]["ID"], CommitStatus.Build)
 
 
 def deploy(queueitem):
     debug.message("Deploy project %s" % queueitem["Commit"]["Project"]["Name"], indent=1)
+    Api.update_status(queueitem["Commit"]["ID"], CommitStatus.Deployed)

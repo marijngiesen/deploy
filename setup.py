@@ -14,5 +14,5 @@ setup(
             'deployd = deploy.main:main',
         ]
     },
-    requires=['requests', 'pygit2']
+    requires=['requests', 'pygit2', 'enum34']
 )

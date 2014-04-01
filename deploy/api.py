@@ -14,17 +14,37 @@ class Api:
         return response.json()
 
     @staticmethod
-    def get_project(id):
-        response = requests.get(registry.config["api"]["url"] + "/projects/%s" % str(id))
-
-        return response.json()
-
-    @staticmethod
     def add_commit(project_id, commit_hash, date_added, message, author, changes):
         payload = {"Hash": str(commit_hash), "DateAdded": str(date_added), "Message": str(message), "Author": str(author),
                    "Changes": str(changes)}
         headers = {'content-type': 'application/json'}
         response = requests.post(registry.config["api"]["url"] + "/projects/%s/commit" % str(project_id),
+                                 data=json.dumps(payload), headers=headers)
+
+        return response.json()
+
+    @staticmethod
+    def update_status(commit_id, status):
+        """
+        Update the status of a commit
+
+        :param commit_id: The ID of the commit
+        :param status: The status
+        :type commit_id: int
+        :type status: CommitStatus
+        """
+        payload = {"Status": status.name}
+        headers = {'content-type': 'application/json'}
+        response = requests.post(registry.config["api"]["url"] + "/commits/%s/status" % str(commit_id),
+                                 data=json.dumps(payload), headers=headers)
+
+        return response.json()
+
+    @staticmethod
+    def update_buildlog(commit_id, buildlog):
+        payload = {"BuildLog": str(buildlog)}
+        headers = {'content-type': 'application/json'}
+        response = requests.post(registry.config["api"]["url"] + "/commits/%s/buildlog" % str(commit_id),
                                  data=json.dumps(payload), headers=headers)
 
         return response.json()

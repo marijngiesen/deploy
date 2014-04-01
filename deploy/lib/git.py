@@ -77,7 +77,7 @@ class Git:
         else:
             text = "commits"
 
-        debug.message("Master is %d %s behind origin/master" % (commit_count, text), indent=1)
+        debug.message("Master is %d %s behind origin/%s" % (commit_count, text, self.origin_branch), indent=1)
 
         return commits
 
@@ -90,7 +90,7 @@ class Git:
         """
         remote_commit = self.repository.revparse_single("origin/%s" % self.origin_branch)
 
-        debug.message("Merge origin/master", indent=1)
+        debug.message("Merge origin/%s" % self.origin_branch, indent=1)
         merge_result = self.repository.merge(remote_commit.oid)
 
         if merge_result.is_fastforward:
