@@ -1,11 +1,13 @@
 from _pygit2 import GitError
 import time
+import build
 import registry
 import repository
 from api import Api
 from lib.git import Git
 from lib import debug
 from commitstatus import CommitStatus
+from projecttype import ProjectType
 
 
 def watch():
@@ -23,10 +25,10 @@ def watch():
                 prepare_repository(queueitem)
 
                 # If the project is CSharp, it has to be built
-                if queueitem["Commit"]["Project"]["Type"] == 0:
-                    build(queueitem)
+                if queueitem["Commit"]["Project"]["Type"] == ProjectType.CSharp:
+                    build_project(queueitem)
 
-                deploy(queueitem)
+                deploy_project(queueitem)
 
         except ValueError, e:
             debug.exception("Error retrieving queue", e)
@@ -48,11 +50,12 @@ def prepare_repository(queueitem):
     repo.checkout_commit(queueitem["Commit"]["Hash"])
 
 
-def build(queueitem):
+def build_project(queueitem):
     debug.message("Build project %s" % queueitem["Commit"]["Project"]["Name"], indent=1)
+    build.start(queueitem)
     Api.update_status(queueitem["Commit"]["ID"], CommitStatus.Build)
 
 
-def deploy(queueitem):
+def deploy_project(queueitem):
     debug.message("Deploy project %s" % queueitem["Commit"]["Project"]["Name"], indent=1)
     Api.update_status(queueitem["Commit"]["ID"], CommitStatus.Deployed)
