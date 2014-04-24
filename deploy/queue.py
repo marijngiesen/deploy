@@ -25,7 +25,7 @@ def watch():
                 prepare_repository(queueitem)
 
                 # If the project is CSharp, it has to be built
-                if queueitem["Commit"]["Project"]["Type"] == ProjectType.CSharp:
+                if queueitem["Commit"]["Project"]["Type"] == ProjectType.CSharp.value:
                     build_project(queueitem)
 
                 deploy_project(queueitem)
@@ -51,8 +51,7 @@ def prepare_repository(queueitem):
 
 
 def build_project(queueitem):
-    debug.message("Build project %s" % queueitem["Commit"]["Project"]["Name"], indent=1)
-    build.start(queueitem)
+    build.run(queueitem)
     Api.update_status(queueitem["Commit"]["ID"], CommitStatus.Build)
 
 

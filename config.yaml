@@ -18,6 +18,7 @@ queue:
 
 build:
   path: /var/www/deploy/build
+  command: export MONO_IOMAP=all; export EnableNuGetPackageRestore=true; xbuild /verbosity:detailed /p:Configuration=Release /p:OutputPath={builddirectory}/bin /fl /flp:LogFile={builddirectory}/build.log /tv:4.0 {solution}
 
 deploy:
   time_between_servers: 15
