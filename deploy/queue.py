@@ -26,12 +26,12 @@ def watch():
 
                 # If the project is CSharp, it has to be built
                 if queueitem["Commit"]["Project"]["Type"] == ProjectType.CSharp.value:
-                    build_project(queueitem)
+                    build.run(queueitem)
 
                 deploy_project(queueitem)
 
         except ValueError, e:
-            debug.exception("Error retrieving queue", e)
+            debug.exception("Error communicating with API", e)
         except GitError, e:
             debug.exception("Error with Git repository", e)
         except Exception, e:
@@ -48,11 +48,6 @@ def prepare_repository(queueitem):
 
     # Check out the correct commit and create a reference to it (deployed)
     repo.checkout_commit(queueitem["Commit"]["Hash"])
-
-
-def build_project(queueitem):
-    build.run(queueitem)
-    Api.update_status(queueitem["Commit"]["ID"], CommitStatus.Build)
 
 
 def deploy_project(queueitem):
