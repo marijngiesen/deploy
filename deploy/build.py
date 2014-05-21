@@ -14,12 +14,12 @@ def run(queueitem):
     builddirectory = get_builddirectory(queueitem["Commit"]["Project"])
     debug.message("Build output directory is: %s" % builddirectory, indent=2)
 
-    projectdirectory = repository.get_path(queueitem["Commit"]["Project"])
-    solution = get_solution(projectdirectory)
-    debug.message("Solution is: %s" % solution, indent=2)
+    solutiondirectory = repository.get_path(queueitem["Commit"]["Project"])
+    projects = get_projects(solutiondirectory)
 
-    build_result = run_build(builddirectory, projectdirectory, solution)
-    # save_buildlog(queueitem, builddirectory)
+    build_result = 0
+    for project in projects:
+        build_result += run_build(builddirectory, project)
 
     if build_result != 0:
         Api.update_status(queueitem["Commit"]["ID"], CommitStatus.BuildError)
@@ -40,26 +40,39 @@ def get_builddirectory(project):
     return builddirectory
 
 
-def run_build(builddirectory, projectdirectory, solution):
-    command = get_command(builddirectory, solution)
+def run_build(builddirectory, project):
+    builddirectory = os.path.join(builddirectory, project["name"])
+    os.makedirs(builddirectory)
+
+    command = get_command(builddirectory, project["file"])
     debug.message("Build command is: %s" % command, indent=2)
 
-    return call(command, shell=True, cwd=projectdirectory)
+    return call(command, shell=True, cwd=project["directory"])
 
 
-def get_solution(projectdirectory):
-    for root, dirs, files in os.walk(projectdirectory):
-        solution = [filename for filename in files if filename.endswith(".sln")]
+def get_projects(projectdirectory):
+    projectfiles = find_project_files(projectdirectory)
 
-        if len(solution) > 0:
-            return solution.pop()
+    if len(projectfiles) < 1:
+        raise IOError("No project files found in solution")
 
-    raise IOError("Solution file not found in project")
+    projects = []
+    for projectfile in projectfiles:
+        project = {"name": projectfile[1].replace(".csproj", ""), "file": projectfile[1], "directory": projectfile[0]}
+        projects.append(project)
+
+    return projects
 
 
-def get_command(builddirectory, solution):
+def find_project_files(projectdirectory):
+    return [[root, filename]
+            for root, dirs, files in os.walk(projectdirectory)
+            for filename in files if filename.endswith(".csproj")]
+
+
+def get_command(builddirectory, projectfile):
     return str(registry.config["build"]["environment"]) + str(registry.config["build"]["command"]).replace(
-        "{builddirectory}", builddirectory).replace("{solution}", solution)
+        "{builddirectory}", builddirectory).replace("{projectfile}", projectfile)
 
 
 def save_buildlog(queueitem, builddirectory):

@@ -51,10 +51,6 @@ class Api:
         response = requests.post(registry.config["api"]["url"] + "/commits/%s/buildlog" % str(commit_id),
                                  data=json.dumps(payload), headers=headers)
 
-        print headers
-        print response
-        print response.text
-
         return response.json()
 
     @staticmethod
