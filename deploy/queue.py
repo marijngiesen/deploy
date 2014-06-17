@@ -1,13 +1,13 @@
 from _pygit2 import GitError
 import time
-import build
+
+import debug
 import registry
 import repository
 from api import Api
-from lib.git import Git
-from lib import debug
-from commitstatus import CommitStatus
-from projecttype import ProjectType
+from git import Git
+from build import Build
+from enums import ProjectType, CommitStatus
 
 
 def watch():
@@ -20,13 +20,6 @@ def watch():
             for queueitem in queue:
                 debug.message("Deploying project %s version %s" % (
                     queueitem["Commit"]["Project"]["Name"], queueitem["Commit"]["Hash"]))
-
-                # Prepare the repository
-                prepare_repository(queueitem)
-
-                # If the project is CSharp, it has to be built
-                if queueitem["Commit"]["Project"]["Type"] == ProjectType.CSharp.value:
-                    build.run(queueitem)
 
                 deploy_project(queueitem)
 

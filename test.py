@@ -9,30 +9,17 @@
 #
 # print repository.get_changes(commit1, commit2)
 
-# from deploy import registry
-# from deploy.commitstatus import CommitStatus
-# from deploy.lib.config import Config
-# from deploy.api import Api
-#
-# cfg = Config("config.yaml")
-# registry.config = cfg.all()
-#
-# queue = Api.get_queue()
-#
-# for queueitem in queue:
-#     print queueitem["Commit"]["Project"]["Type"]
+from deploy import registry
+from deploy.build import Build
+from deploy.config import Config
+from deploy.api import Api
 
-# repository = Git("/var/www/deploy/deploy+ui", "https://github.com/marijngiesen/deploy-ui.git")
-# repository.checkout_commit("42283823caefd4e3622e661ff7e7dd1ec4637109")
+cfg = Config("config.yaml")
+registry.config = cfg.all()
 
-# Api.update_buildlog(65, "Test build log")
-# Api.update_status(65, CommitStatus.Build)
+queue = Api.get_queue()
 
-from deploy import build
+for queueitem in queue:
+    build = Build(queueitem)
 
-projects = build.get_projects("/var/www/deploy/repositories/icheckmovies-.net")
-
-for project in projects:
-    print "-" * 10
-    print project
-    print " " * 2 + project["name"]
+    print build.get_solutions()

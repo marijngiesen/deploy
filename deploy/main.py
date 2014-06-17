@@ -1,7 +1,10 @@
 import sys
 import time
 from multiprocessing import Process, Queue
-from lib import daemon, debug
+
+import debug
+import daemon
+import buildqueue
 import registry
 import repository
 import queue
@@ -10,8 +13,16 @@ import queue
 def run():
     processes = []
 
+    # Create build queue
+    build_queue = Queue()
+
+    # Start buildqueue watcher
+    buildqueue_watcher = Process(target=buildqueue.watch, args=(build_queue,))
+    buildqueue_watcher.start()
+    processes.append(buildqueue_watcher)
+
     # Start repository watcher
-    repository_watcher = Process(target=repository.watch)
+    repository_watcher = Process(target=repository.watch, args=(build_queue,))
     repository_watcher.start()
     processes.append(repository_watcher)
 

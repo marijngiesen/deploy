@@ -17,12 +17,11 @@ queue:
   check_interval: 30
 
 build:
+  check_interval: 30
   path: /var/www/deploy/build
+  outdir: bin/publish
   environment: export MONO_IOMAP=all; export EnableNuGetPackageRestore=true; export LD_LIBRARY_PATH=/opt/mono-master/lib:$LD_LIBRARY_PATH; export PKG_CONFIG_PATH=/opt/mono-master/lib/pkgconfig:$PKG_CONFIG_PATH;
-  command: xbuild /verbosity:detailed /p:Configuration=Release /p:OutputPath={builddirectory}/bin /fl /flp:LogFile={builddirectory}/build.log /tv:4.0 {projectfile} > /dev/null
-  guids:
-    console:
-    website: {349c5851-65df-11da-9384-00065b846f21}
+  command: xbuild /verbosity:minimal /p:Configuration={configuration} /p:VisualStudioVersion=11.0 /p:OutDir={outdir}/{configuration}/ /fl /flp:LogFile={builddirectory}/build.log /tv:4.0 {solution} > /dev/null
 
 deploy:
   time_between_servers: 15

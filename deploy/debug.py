@@ -26,7 +26,7 @@ def message(msg, indent=0):
     if Debug.enabled:
         msg = str(msg)
         if indent > 0:
-            msg = "+" * indent + " " + msg
+            msg = "+" + "-" * (indent - 1) + " " + msg
         print str(datetime.today()) + " " + str(Debug.process) + ": [" + str(Debug.prefix) + "] " + msg
 
 
