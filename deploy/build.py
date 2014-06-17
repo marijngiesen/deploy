@@ -16,8 +16,8 @@ class Build:
     project_directory = None
     build_directory = None
 
-    def __init__(self, queue_item):
-        self.project = queue_item["Commit"]["Project"]
+    def __init__(self, project):
+        self.project = project
         self.commit = queue_item["Commit"]
         self.project_directory = repository.get_path(self.project)
 
